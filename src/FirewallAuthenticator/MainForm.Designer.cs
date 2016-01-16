@@ -61,6 +61,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.authTimer = new System.Windows.Forms.Timer(this.components);
             this.statusTimer = new System.Windows.Forms.Timer(this.components);
+            this.ignoreCertificateErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbXMLFile.SuspendLayout();
             this.gbLogin.SuspendLayout();
             this.gbResults.SuspendLayout();
@@ -252,7 +253,8 @@
             this.createXMLFileToolStripMenuItem,
             this.toolStripMenuItem1,
             this.mustEnterPasswordToolStripMenuItem,
-            this.reauthTimerToolStripMenuItem});
+            this.reauthTimerToolStripMenuItem,
+            this.ignoreCertificateErrorsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
@@ -337,6 +339,12 @@
             this.statusTimer.Interval = 5000;
             this.statusTimer.Tick += new System.EventHandler(this.statusTimer_Tick);
             // 
+            // ignoreCertificateErrorsToolStripMenuItem
+            // 
+            this.ignoreCertificateErrorsToolStripMenuItem.Name = "ignoreCertificateErrorsToolStripMenuItem";
+            this.ignoreCertificateErrorsToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.ignoreCertificateErrorsToolStripMenuItem.Text = "Ignore Certificate Errors";
+            // 
             // frmMain
             // 
             this.AcceptButton = this.btnAuthenticate;
@@ -402,7 +410,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuItemTwoHours;
         private System.Windows.Forms.ToolStripMenuItem menuItemFourHours;
         private System.Windows.Forms.Timer statusTimer;
-
+        private System.Windows.Forms.ToolStripMenuItem ignoreCertificateErrorsToolStripMenuItem;
     }
 }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Drawing;
 using System.IO;
@@ -9,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using WebBrowserControlDialogs;
 
 namespace FirewallAuthenticator
 {
@@ -47,6 +47,10 @@ namespace FirewallAuthenticator
         {
             InitializeComponent();
 
+            // Subscribe to Event(s) with the WindowsInterop Class
+            WindowsInterop.SecurityAlertDialogWillBeShown +=
+                new GenericDelegate<Boolean, Boolean>(this.WindowsInterop_SecurityAlertDialogWillBeShown);
+
             try
             {
                 InitIcons();
@@ -58,6 +62,13 @@ namespace FirewallAuthenticator
             {
                 MessageBox.Show(String.Format("The application encountered a problem.\r\nMessage: {0}", ex.Message));
             }
+        }
+
+        private bool WindowsInterop_SecurityAlertDialogWillBeShown(bool param)
+        {
+            // Return true to ignore and not show the 
+            // "Security Alert" dialog to the user
+            return true;
         }
 
         private void InitIcons()
@@ -150,7 +161,6 @@ namespace FirewallAuthenticator
                     else
                     {
                         // no STATE element, so determine if valid login or invalid and requires relogin
-
                         AuthResult r = new AuthResult();
 
                         if (br.Document.Title.Contains("Authentication"))
