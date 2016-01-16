@@ -14,9 +14,6 @@ namespace FirewallAuthenticator
 {
     public partial class frmMain : Form
     {
-        DateTime LastAuth;
-        string passwordString = string.Empty;
-
         [DllImport("Shell32.dll")]
         public extern static int ExtractIconEx(
             string libName,
@@ -33,15 +30,18 @@ namespace FirewallAuthenticator
             int iconIndex
         );
         // tooltip index
-        int ttIndex = -1;
+        int _ttIndex = -1;
         // global firewall groups
         Dictionary<String, List<String>> _fwgrps = null;
 
-        Icon iconLargeApplication = null;
-        Icon iconSmallApplication = null;
-        Icon iconSysTrayGood = null;
-        Icon iconSysTrayBad = null;
-        Icon iconSysTrayNotify = null;
+        Icon _iconLargeApplication = null;
+        Icon _iconSmallApplication = null;
+        Icon _iconSysTrayGood = null;
+        Icon _iconSysTrayBad = null;
+        Icon _iconSysTrayNotify = null;
+
+        DateTime _lastAuth;
+        string _passwordString = string.Empty;
 
         public frmMain()
         {
@@ -49,9 +49,9 @@ namespace FirewallAuthenticator
 
             try
             {
-                initIcons();
+                InitIcons();
                 InitConfigFile();
-                initControls();
+                InitControls();
                 InitUsername();
             }
             catch (Exception ex)
@@ -60,30 +60,30 @@ namespace FirewallAuthenticator
             }
         }
 
-        private void initIcons()
+        private void InitIcons()
         {
             // Icons viewed from http://diymediahome.org/windows-icons-reference-list-with-details-locations-images/
             // Using the shield icons to show good/bad/notify states
             // %windir%\system32\imageres.dll
 
             // Dummy large icon
-            Icon dummyLage;
+            Icon dummyLarge;
             // Padlock icons
-            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 54, out iconLargeApplication, out iconSmallApplication);
+            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 54, out _iconLargeApplication, out _iconSmallApplication);
             // Green sheild
-            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 101, out dummyLage, out iconSysTrayGood);
+            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 101, out dummyLarge, out _iconSysTrayGood);
             // Red sheild
-            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 100, out dummyLage, out iconSysTrayBad);
+            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 100, out dummyLarge, out _iconSysTrayBad);
             // Yellow sheild
-            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 102, out dummyLage, out iconSysTrayNotify);
+            GetIconsFromDLL(@"%windir%\system32\imageres.dll", 102, out dummyLarge, out _iconSysTrayNotify);
 
-            if (iconLargeApplication != null)
+            if (_iconLargeApplication != null)
             {
-                this.Icon = iconLargeApplication;
+                this.Icon = _iconLargeApplication;
             }
-            if (iconSysTrayNotify != null)
+            if (_iconSysTrayNotify != null)
             {
-                notifyIcon1.Icon = iconSysTrayNotify;
+                notifyIcon1.Icon = _iconSysTrayNotify;
             }
         }
 
@@ -137,7 +137,7 @@ namespace FirewallAuthenticator
                         else if (step == "2")
                         {
                             // fill in password and click submit button
-                            br.Document.GetElementById("DATA").OuterHtml = String.Format("<INPUT value=\"{0}\" name=DATA>", passwordString);
+                            br.Document.GetElementById("DATA").OuterHtml = String.Format("<INPUT value=\"{0}\" name=DATA>", _passwordString);
                             br.Document.GetElementsByTagName("INPUT")[3].InvokeMember("click");
                         }
                         // method page
@@ -188,7 +188,7 @@ namespace FirewallAuthenticator
                             *  If you want to manipulate UI elements via other threads, you'll have to run the actual manipulation on the UI thread. 
                             *  A control's InvokeRequired property will also tell you if you need to use Invoke rather than calling the method directly.
                            */
-                        Invoke(new Action(() => displayResult(r)));
+                        Invoke(new Action(() => DisplayResult(r)));
                         br.Dispose();
                     }
                 }
@@ -203,7 +203,7 @@ namespace FirewallAuthenticator
                 txtXMLFile.Text = ofdXMLfile.FileName;
         }
 
-        private void initControls()
+        private void InitControls()
         {
             txtXMLFile.Enabled = false;
 
@@ -278,7 +278,7 @@ namespace FirewallAuthenticator
                 return;
             }
 
-            passwordString = txtPassword.Text;
+            _passwordString = txtPassword.Text;
 
             if (mustEnterPasswordToolStripMenuItem.Checked)
             {
@@ -289,7 +289,7 @@ namespace FirewallAuthenticator
             {
                 // validate the credentials
 
-                bool isValid = pc.ValidateCredentials(txtUsername.Text, passwordString, ContextOptions.Negotiate);
+                bool isValid = pc.ValidateCredentials(txtUsername.Text, _passwordString, ContextOptions.Negotiate);
                 if (!isValid)
                 {
                     MessageBox.Show("Credentials are invalid! Please check Username and Password.");
@@ -300,7 +300,7 @@ namespace FirewallAuthenticator
 
             // disable button
             btnAuthenticate.Enabled = false;
-            LastAuth = DateTime.Now;
+            _lastAuth = DateTime.Now;
 
             // kick off the authentication routine
             AuthenticateWithFirewalls();
@@ -376,12 +376,12 @@ namespace FirewallAuthenticator
                     {
                         try
                         {
-                            runBrowser(url);
+                            RunBrowser(url);
                         }
                         catch (Exception ex)
                         {
                             MessageBox.Show(String.Format("Unable to run authentication routine. \r\nMessage: {0}", ex.Message));
-                            initControls();
+                            InitControls();
                             return;
                         }
                     }
@@ -390,19 +390,19 @@ namespace FirewallAuthenticator
             else
             {
                 MessageBox.Show("Unable to run authentication routine.  Firewall groups could not be determined.");
-                initControls();
+                InitControls();
                 return;
             }
         }
 
-        private void runBrowser(String URL)
+        private void RunBrowser(String URL)
         {
             var br = new WebBrowser();
             br.DocumentCompleted += browser_DocumentCompleted;
             br.Navigate(URL);
         }
 
-        private void displayResult(AuthResult result)
+        private void DisplayResult(AuthResult result)
         {
             if (result != null)
             {
@@ -462,17 +462,17 @@ namespace FirewallAuthenticator
 
         private void clbURLGroups_MouseMove(object sender, MouseEventArgs e)
         {
-            if (ttIndex != clbURLGroups.IndexFromPoint(e.Location))
+            if (_ttIndex != clbURLGroups.IndexFromPoint(e.Location))
                 ShowToolTip();
         }
 
         private void ShowToolTip()
         {
-            ttIndex = clbURLGroups.IndexFromPoint(clbURLGroups.PointToClient(MousePosition));
+            _ttIndex = clbURLGroups.IndexFromPoint(clbURLGroups.PointToClient(MousePosition));
 
-            if (ttIndex > -1)
+            if (_ttIndex > -1)
             {
-                String grpname = clbURLGroups.Items[ttIndex].ToString();
+                String grpname = clbURLGroups.Items[_ttIndex].ToString();
                 StringBuilder sb = new StringBuilder();
 
                 Point p = PointToClient(MousePosition);
@@ -612,21 +612,21 @@ namespace FirewallAuthenticator
 
         private void statusTimer_Tick(object sender, EventArgs e)
         {
-            if (LastAuth != null)
+            if (_lastAuth != null)
             {
-                if ((LastAuth == null || (DateTime.Now - LastAuth).TotalSeconds >= 300) && notifyIcon1.Icon != iconSysTrayBad)
+                if ((_lastAuth == null || (DateTime.Now - _lastAuth).TotalSeconds >= 300) && notifyIcon1.Icon != _iconSysTrayBad)
                 {
-                    if (iconSysTrayNotify != null)
+                    if (_iconSysTrayNotify != null)
                     {
-                        notifyIcon1.Icon = iconSysTrayNotify;
+                        notifyIcon1.Icon = _iconSysTrayNotify;
                         notifyIcon1.Text = "Firewall Authenticator - Authentication Time";
                     }
                 }
-                else if (notifyIcon1.Icon != iconSysTrayBad)
+                else if (notifyIcon1.Icon != _iconSysTrayBad)
                 {
-                    if (iconSysTrayGood != null)
+                    if (_iconSysTrayGood != null)
                     {
-                        notifyIcon1.Icon = iconSysTrayGood;
+                        notifyIcon1.Icon = _iconSysTrayGood;
                         notifyIcon1.Text = "Firewall Authenticator";
                     }
                 }
