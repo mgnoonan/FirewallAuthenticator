@@ -253,8 +253,8 @@
             this.createXMLFileToolStripMenuItem,
             this.toolStripMenuItem1,
             this.mustEnterPasswordToolStripMenuItem,
-            this.reauthTimerToolStripMenuItem,
-            this.ignoreCertificateErrorsToolStripMenuItem});
+            this.ignoreCertificateErrorsToolStripMenuItem,
+            this.reauthTimerToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
@@ -341,6 +341,9 @@
             // 
             // ignoreCertificateErrorsToolStripMenuItem
             // 
+            this.ignoreCertificateErrorsToolStripMenuItem.Checked = true;
+            this.ignoreCertificateErrorsToolStripMenuItem.CheckOnClick = true;
+            this.ignoreCertificateErrorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ignoreCertificateErrorsToolStripMenuItem.Name = "ignoreCertificateErrorsToolStripMenuItem";
             this.ignoreCertificateErrorsToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.ignoreCertificateErrorsToolStripMenuItem.Text = "Ignore Certificate Errors";

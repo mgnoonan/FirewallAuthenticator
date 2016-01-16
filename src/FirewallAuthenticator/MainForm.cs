@@ -42,6 +42,7 @@ namespace FirewallAuthenticator
 
         DateTime _lastAuth;
         string _passwordString = string.Empty;
+        bool _ignoreSslErrors = true;
 
         public frmMain()
         {
@@ -68,7 +69,7 @@ namespace FirewallAuthenticator
         {
             // Return true to ignore and not show the 
             // "Security Alert" dialog to the user
-            return true;
+            return _ignoreSslErrors;
         }
 
         private void InitIcons()
@@ -288,8 +289,8 @@ namespace FirewallAuthenticator
                 return;
             }
 
+            _ignoreSslErrors = ignoreCertificateErrorsToolStripMenuItem.Checked;
             _passwordString = txtPassword.Text;
-
             if (mustEnterPasswordToolStripMenuItem.Checked)
             {
                 txtPassword.Clear();
