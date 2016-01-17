@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
+using WebBrowserControlDialogs;
 
 namespace FirewallAuthenticator
 {
@@ -15,7 +14,14 @@ namespace FirewallAuthenticator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // Tell the WidowsInterop to Hook messages
+            WindowsInterop.Hook();
+
             Application.Run(new frmMain());
+
+            // Tell the WidowsInterop to Unhook
+            WindowsInterop.Unhook();
         }
     }
 }
