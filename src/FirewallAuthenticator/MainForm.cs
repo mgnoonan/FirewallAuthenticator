@@ -226,6 +226,7 @@ namespace FirewallAuthenticator
             }
 
             ofdXMLfile.DefaultExt = "*.xml";
+            ofdXMLfile.Filter = "Xml files (*.xml)|*.xml|All files (*.*)|*.*";
             ofdXMLfile.CheckFileExists = true;
             ofdXMLfile.FileName = String.Empty;
 
@@ -246,32 +247,27 @@ namespace FirewallAuthenticator
 
         private void btnAuthenticate_Click(object sender, EventArgs e)
         {
-
             if (String.IsNullOrWhiteSpace(txtXMLFile.Text))
             {
                 MessageBox.Show("Please select an XML file with Firewall URLs!");
-                txtXMLFile.Focus();
-                return;
-            }
-
-            if (!File.Exists(txtXMLFile.Text))
-            {
-                MessageBox.Show(String.Format("The file '{0}' does not exist.  Please enter or select a valid file.", txtXMLFile.Text));
-                txtXMLFile.Focus();
                 return;
             }
 
             if (clbURLGroups.Items.Count == 0)
             {
                 MessageBox.Show("Nothing has been loaded into URL Groups list!  Please try another xml file!");
-                txtXMLFile.Focus();
-                txtXMLFile.Text = String.Empty;
                 return;
             }
             else if (clbURLGroups.CheckedItems.Count == 0)
             {
                 MessageBox.Show("Please check at least one item in the URL Groups list!");
-                clbURLGroups.Focus();
+                return;
+            }
+
+            if (String.IsNullOrWhiteSpace(txtDomain.Text))
+            {
+                MessageBox.Show("Please enter a Domain!");
+                txtDomain.Focus();
                 return;
             }
 
@@ -322,8 +318,8 @@ namespace FirewallAuthenticator
             btnAuthenticate.Enabled = true;
 
             // upon successful auth, save the file name and selected groups to cfg file
-            XMLFileManager.SaveFirewallsFile(txtXMLFile.Text);
-            XMLFileManager.SaveSelectedGroups(clbURLGroups.CheckedItems.OfType<String>().ToList());
+            //XMLFileManager.SaveFirewallsFile(txtXMLFile.Text);
+            //XMLFileManager.SaveSelectedGroups(clbURLGroups.CheckedItems.OfType<String>().ToList());
         }
 
         private void PopulateFirewallGroupNames(List<String> GroupNames)
@@ -520,12 +516,13 @@ namespace FirewallAuthenticator
 
         private void InitUsername()
         {
+            txtDomain.Text = Environment.UserDomainName;
             txtUsername.Text = Environment.UserName;
         }
 
         private void InitConfigFile()
         {
-            XMLFileManager.CreateConfigXMLFile();
+            //XMLFileManager.CreateEmptyUserSettingsFile();
         }
 
         private void frmMain_Resize(object sender, EventArgs e)

@@ -42,7 +42,6 @@
             this.gbResults = new System.Windows.Forms.GroupBox();
             this.txtResults = new System.Windows.Forms.RichTextBox();
             this.gbURLGroups = new System.Windows.Forms.GroupBox();
-            this.lblURLGroups = new System.Windows.Forms.Label();
             this.clbURLGroups = new System.Windows.Forms.CheckedListBox();
             this.ttUrls = new System.Windows.Forms.ToolTip(this.components);
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
@@ -54,6 +53,7 @@
             this.createXMLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.mustEnterPasswordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ignoreCertificateErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reauthTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOneHour = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTwoHours = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +61,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.authTimer = new System.Windows.Forms.Timer(this.components);
             this.statusTimer = new System.Windows.Forms.Timer(this.components);
-            this.ignoreCertificateErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtDomain = new System.Windows.Forms.TextBox();
             this.gbXMLFile.SuspendLayout();
             this.gbLogin.SuspendLayout();
             this.gbResults.SuspendLayout();
@@ -83,14 +84,14 @@
             this.gbXMLFile.Size = new System.Drawing.Size(470, 53);
             this.gbXMLFile.TabIndex = 0;
             this.gbXMLFile.TabStop = false;
-            this.gbXMLFile.Text = "Firewall URLs File";
+            this.gbXMLFile.Text = "Configuration file";
             // 
             // btnXMlFile
             // 
             this.btnXMlFile.Location = new System.Drawing.Point(387, 16);
             this.btnXMlFile.Name = "btnXMlFile";
             this.btnXMlFile.Size = new System.Drawing.Size(75, 25);
-            this.btnXMlFile.TabIndex = 1;
+            this.btnXMlFile.TabIndex = 0;
             this.btnXMlFile.Text = "Browse";
             this.btnXMlFile.UseVisualStyleBackColor = true;
             this.btnXMlFile.Click += new System.EventHandler(this.btnXMlFile_Click);
@@ -99,13 +100,17 @@
             // 
             this.txtXMLFile.Location = new System.Drawing.Point(6, 19);
             this.txtXMLFile.Name = "txtXMLFile";
+            this.txtXMLFile.ReadOnly = true;
             this.txtXMLFile.Size = new System.Drawing.Size(374, 20);
             this.txtXMLFile.TabIndex = 0;
+            this.txtXMLFile.TabStop = false;
             this.txtXMLFile.Text = "Click Browse to select an XML File with Firewall URLs";
             this.txtXMLFile.TextChanged += new System.EventHandler(this.txtXMLFile_TextChanged);
             // 
             // gbLogin
             // 
+            this.gbLogin.Controls.Add(this.label1);
+            this.gbLogin.Controls.Add(this.txtDomain);
             this.gbLogin.Controls.Add(this.btnAuthenticate);
             this.gbLogin.Controls.Add(this.lblPwd);
             this.gbLogin.Controls.Add(this.lblUName);
@@ -120,10 +125,10 @@
             // 
             // btnAuthenticate
             // 
-            this.btnAuthenticate.Location = new System.Drawing.Point(9, 96);
+            this.btnAuthenticate.Location = new System.Drawing.Point(9, 99);
             this.btnAuthenticate.Name = "btnAuthenticate";
             this.btnAuthenticate.Size = new System.Drawing.Size(151, 23);
-            this.btnAuthenticate.TabIndex = 4;
+            this.btnAuthenticate.TabIndex = 5;
             this.btnAuthenticate.Text = "Authenticate!";
             this.btnAuthenticate.UseVisualStyleBackColor = true;
             this.btnAuthenticate.Click += new System.EventHandler(this.btnAuthenticate_Click);
@@ -131,7 +136,7 @@
             // lblPwd
             // 
             this.lblPwd.AutoSize = true;
-            this.lblPwd.Location = new System.Drawing.Point(6, 62);
+            this.lblPwd.Location = new System.Drawing.Point(6, 71);
             this.lblPwd.Name = "lblPwd";
             this.lblPwd.Size = new System.Drawing.Size(56, 13);
             this.lblPwd.TabIndex = 3;
@@ -140,7 +145,7 @@
             // lblUName
             // 
             this.lblUName.AutoSize = true;
-            this.lblUName.Location = new System.Drawing.Point(6, 36);
+            this.lblUName.Location = new System.Drawing.Point(6, 49);
             this.lblUName.Name = "lblUName";
             this.lblUName.Size = new System.Drawing.Size(58, 13);
             this.lblUName.TabIndex = 2;
@@ -148,18 +153,18 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(70, 59);
+            this.txtPassword.Location = new System.Drawing.Point(70, 68);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(90, 20);
-            this.txtPassword.TabIndex = 1;
+            this.txtPassword.TabIndex = 4;
             // 
             // txtUsername
             // 
-            this.txtUsername.Location = new System.Drawing.Point(70, 33);
+            this.txtUsername.Location = new System.Drawing.Point(70, 46);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(90, 20);
-            this.txtUsername.TabIndex = 0;
+            this.txtUsername.TabIndex = 3;
             // 
             // gbResults
             // 
@@ -173,39 +178,33 @@
             // 
             // txtResults
             // 
+            this.txtResults.BackColor = System.Drawing.Color.LightYellow;
             this.txtResults.Location = new System.Drawing.Point(6, 19);
             this.txtResults.Name = "txtResults";
+            this.txtResults.ReadOnly = true;
             this.txtResults.Size = new System.Drawing.Size(452, 116);
             this.txtResults.TabIndex = 0;
+            this.txtResults.TabStop = false;
             this.txtResults.Text = "Authentication results will show here.";
             // 
             // gbURLGroups
             // 
-            this.gbURLGroups.Controls.Add(this.lblURLGroups);
             this.gbURLGroups.Controls.Add(this.clbURLGroups);
             this.gbURLGroups.Location = new System.Drawing.Point(12, 93);
             this.gbURLGroups.Name = "gbURLGroups";
             this.gbURLGroups.Size = new System.Drawing.Size(292, 137);
             this.gbURLGroups.TabIndex = 3;
             this.gbURLGroups.TabStop = false;
-            this.gbURLGroups.Text = "URL Groups";
-            // 
-            // lblURLGroups
-            // 
-            this.lblURLGroups.Location = new System.Drawing.Point(7, 20);
-            this.lblURLGroups.Name = "lblURLGroups";
-            this.lblURLGroups.Size = new System.Drawing.Size(279, 18);
-            this.lblURLGroups.TabIndex = 1;
-            this.lblURLGroups.Text = "Select one or more URL groups to authenticate against:";
+            this.gbURLGroups.Text = "Firewall Groups";
             // 
             // clbURLGroups
             // 
             this.clbURLGroups.FormattingEnabled = true;
-            this.clbURLGroups.Location = new System.Drawing.Point(9, 37);
+            this.clbURLGroups.Location = new System.Drawing.Point(9, 19);
             this.clbURLGroups.Name = "clbURLGroups";
             this.clbURLGroups.ScrollAlwaysVisible = true;
-            this.clbURLGroups.Size = new System.Drawing.Size(277, 94);
-            this.clbURLGroups.TabIndex = 0;
+            this.clbURLGroups.Size = new System.Drawing.Size(277, 109);
+            this.clbURLGroups.TabIndex = 1;
             this.clbURLGroups.MouseMove += new System.Windows.Forms.MouseEventHandler(this.clbURLGroups_MouseMove);
             // 
             // notifyIcon1
@@ -273,12 +272,19 @@
             // 
             // mustEnterPasswordToolStripMenuItem
             // 
-            this.mustEnterPasswordToolStripMenuItem.Checked = true;
             this.mustEnterPasswordToolStripMenuItem.CheckOnClick = true;
-            this.mustEnterPasswordToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mustEnterPasswordToolStripMenuItem.Name = "mustEnterPasswordToolStripMenuItem";
             this.mustEnterPasswordToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.mustEnterPasswordToolStripMenuItem.Text = "Always Require Password";
+            // 
+            // ignoreCertificateErrorsToolStripMenuItem
+            // 
+            this.ignoreCertificateErrorsToolStripMenuItem.Checked = true;
+            this.ignoreCertificateErrorsToolStripMenuItem.CheckOnClick = true;
+            this.ignoreCertificateErrorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignoreCertificateErrorsToolStripMenuItem.Name = "ignoreCertificateErrorsToolStripMenuItem";
+            this.ignoreCertificateErrorsToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.ignoreCertificateErrorsToolStripMenuItem.Text = "Ignore Certificate Errors";
             // 
             // reauthTimerToolStripMenuItem
             // 
@@ -339,14 +345,21 @@
             this.statusTimer.Interval = 5000;
             this.statusTimer.Tick += new System.EventHandler(this.statusTimer_Tick);
             // 
-            // ignoreCertificateErrorsToolStripMenuItem
+            // label1
             // 
-            this.ignoreCertificateErrorsToolStripMenuItem.Checked = true;
-            this.ignoreCertificateErrorsToolStripMenuItem.CheckOnClick = true;
-            this.ignoreCertificateErrorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ignoreCertificateErrorsToolStripMenuItem.Name = "ignoreCertificateErrorsToolStripMenuItem";
-            this.ignoreCertificateErrorsToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.ignoreCertificateErrorsToolStripMenuItem.Text = "Ignore Certificate Errors";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 27);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(46, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Domain:";
+            // 
+            // txtDomain
+            // 
+            this.txtDomain.Location = new System.Drawing.Point(70, 24);
+            this.txtDomain.Name = "txtDomain";
+            this.txtDomain.Size = new System.Drawing.Size(90, 20);
+            this.txtDomain.TabIndex = 2;
             // 
             // frmMain
             // 
@@ -359,7 +372,9 @@
             this.Controls.Add(this.gbResults);
             this.Controls.Add(this.gbXMLFile);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Firewall Authenticator";
@@ -394,7 +409,6 @@
         private System.Windows.Forms.GroupBox gbResults;
         private System.Windows.Forms.GroupBox gbURLGroups;
         private System.Windows.Forms.CheckedListBox clbURLGroups;
-        private System.Windows.Forms.Label lblURLGroups;
         private System.Windows.Forms.RichTextBox txtResults;
         private System.Windows.Forms.ToolTip ttUrls;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
@@ -414,6 +428,8 @@
         private System.Windows.Forms.ToolStripMenuItem menuItemFourHours;
         private System.Windows.Forms.Timer statusTimer;
         private System.Windows.Forms.ToolStripMenuItem ignoreCertificateErrorsToolStripMenuItem;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtDomain;
     }
 }
 

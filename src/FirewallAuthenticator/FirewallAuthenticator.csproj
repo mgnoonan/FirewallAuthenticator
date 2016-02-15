@@ -41,6 +41,10 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
@@ -68,6 +72,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharedDelegates.cs" />
     <Compile Include="StringConstants.cs" />
+    <Compile Include="UserSettings.cs" />
+    <Compile Include="Utility.cs" />
     <Compile Include="WindowsInterop.cs" />
     <Compile Include="XMLFileManager.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -83,6 +89,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace FirewallAuthenticator
 {
@@ -22,7 +23,7 @@ namespace FirewallAuthenticator
 
         //private static String FirewallsFile = String.Format("{0}{1}", System.AppDomain.CurrentDomain.BaseDirectory, "firewallfile.xml");
 
-        private static string ConfigFile
+        private static string UserSettingsFile
         {
             get
             {
@@ -37,7 +38,6 @@ namespace FirewallAuthenticator
 
                 // otherwise hardcode
                 return String.Format(@"C:\temp\{0}", filename);
-
             }
 
         }
@@ -73,32 +73,46 @@ namespace FirewallAuthenticator
             return firewallfile;
         }
 
-        /// <summary>
-        /// creates config file to store common info for the app
-        /// </summary>
-        public static void CreateConfigXMLFile()
+        private static UserSettings LoadUserSettingsFile()
         {
-            if (!File.Exists(ConfigFile))
+            //return XDocument.Load(UserSettingsFile);
+
+            XmlSerializer serializer = new XmlSerializer(typeof(UserSettings));
+
+            // Open the file and deserialize the contents
+            using (FileStream fs = new FileStream(UserSettingsFile, FileMode.Open))
             {
-
-                XmlDocument doc = new XmlDocument();
-
-                XmlElement element1 = doc.CreateElement("", XMLCONFIG_ELEMENT_ROOT, "");
-                doc.AppendChild(element1);
-
-                XmlElement element2 = doc.CreateElement("", XMLCONFIG_ELEMENT_FWFILE, "");
-                element1.AppendChild(element2);
-
-                XmlElement element3 = doc.CreateElement("", XMLCONFIG_ELEMENT_SELGRPS, "");
-                element1.AppendChild(element3);
-
-                doc.Save(ConfigFile);
+                return (UserSettings)serializer.Deserialize(fs);
             }
         }
 
-        public static void SaveFirewallsFile(string firewallsfile)
+        private static void SaveUserSettingsFile(UserSettings settings)
         {
-            XDocument xdoc = XDocument.Load(ConfigFile);
+            Utility.SerializeObject<UserSettings>(settings, UserSettingsFile);
+        }
+
+        /// <summary>
+        /// Creates empty user settings file
+        /// </summary>
+        public static void CreateEmptyUserSettingsFile()
+        {
+            XmlDocument doc = new XmlDocument();
+
+            XmlElement element1 = doc.CreateElement("", XMLCONFIG_ELEMENT_ROOT, "");
+            doc.AppendChild(element1);
+
+            XmlElement element2 = doc.CreateElement("", XMLCONFIG_ELEMENT_FWFILE, "");
+            element1.AppendChild(element2);
+
+            XmlElement element3 = doc.CreateElement("", XMLCONFIG_ELEMENT_SELGRPS, "");
+            element1.AppendChild(element3);
+
+            doc.Save(UserSettingsFile);
+        }
+
+        public static void SaveFirewallsFile(string firewallsfile, UserSettings settings)
+        {
+            XDocument xdoc = XDocument.Load(UserSettingsFile);
 
             if (xdoc != null)
             {
@@ -106,66 +120,50 @@ namespace FirewallAuthenticator
                 if (element != null)
                 {
                     element.Value = firewallsfile;
-                    xdoc.Save(ConfigFile);
+                    xdoc.Save(UserSettingsFile);
                 }
             }
         }
 
         public static String GetFirewallsFile()
         {
-            CreateConfigXMLFile();
-
-            XDocument xdoc = XDocument.Load(ConfigFile);
-
-            if (xdoc != null)
+            if (!File.Exists(UserSettingsFile))
             {
-                var element = xdoc.Descendants(XMLCONFIG_ELEMENT_FWFILE).Single();
-
-                if (element != null)
-                {
-                    return element.Value.ToString();
-                }
+                CreateEmptyUserSettingsFile();
             }
 
-            return null;
-
+            UserSettings settings = LoadUserSettingsFile();
+            return settings.FirewallFilename;
         }
 
         public static List<String> GetSavedGroups()
         {
-            CreateConfigXMLFile();
-
-            XDocument xdoc = XDocument.Load(ConfigFile);
-
-            if (xdoc != null)
+            if (!File.Exists(UserSettingsFile))
             {
-                var element = xdoc.Descendants(XMLCONFIG_ELEMENT_SELGRPS).Single();
+                CreateEmptyUserSettingsFile();
+            }
 
-                if (element != null)
-                {
-                    return element.Value.Split(',').ToList();
-                }
+            UserSettings settings = LoadUserSettingsFile();
+
+            if (!string.IsNullOrWhiteSpace(settings.SelectedGroups))
+            {
+                return settings.SelectedGroups.Split(',').ToList();
             }
 
             return null;
-
         }
 
         public static void SaveSelectedGroups(List<String> selectedgroups)
         {
-            XDocument xdoc = XDocument.Load(ConfigFile);
-
-            if (xdoc != null)
+            if (!File.Exists(UserSettingsFile))
             {
-                var element = xdoc.Descendants(XMLCONFIG_ELEMENT_SELGRPS).Single();
-                if (element != null)
-                {
-                    element.Value = String.Join(",", selectedgroups);
-                    xdoc.Save(ConfigFile);
-                }
+                CreateEmptyUserSettingsFile();
             }
 
-        }
+            UserSettings settings = LoadUserSettingsFile();
+            settings.SelectedGroups = string.Join(",", selectedgroups);
 
+            SaveUserSettingsFile(settings);
+        }
     }
 }
