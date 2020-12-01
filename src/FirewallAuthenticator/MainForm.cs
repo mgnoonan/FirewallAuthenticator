@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -244,6 +245,7 @@ namespace FirewallAuthenticator
             statusTimer.Start();
         }
 
+        [SupportedOSPlatform("windows")]
         private void btnAuthenticate_Click(object sender, EventArgs e)
         {
 
@@ -623,9 +625,9 @@ namespace FirewallAuthenticator
 
         private void statusTimer_Tick(object sender, EventArgs e)
         {
-            if (_lastAuth != null)
+            if (_lastAuth != default)
             {
-                if ((_lastAuth == null || (DateTime.Now - _lastAuth).TotalSeconds >= 300) && notifyIcon1.Icon != _iconSysTrayBad)
+                if ((_lastAuth == default || (DateTime.Now - _lastAuth).TotalSeconds >= 300) && notifyIcon1.Icon != _iconSysTrayBad)
                 {
                     if (_iconSysTrayNotify != null)
                     {

@@ -30,33 +30,36 @@ namespace WebBrowserControlDialogs
 
         [DllImport("user32.dll")]
         private static extern IntPtr SetWindowsHookEx(HookType hooktype, HookProcedureDelegate callback, IntPtr hMod, UInt32 dwThreadId);
-        
+
         [DllImport("user32.dll")]
         private static extern IntPtr UnhookWindowsHookEx(IntPtr hhk);
-        
+
         [DllImport("user32.dll")]
         private static extern Int32 CallNextHookEx(IntPtr hhk, Int32 nCode, IntPtr wParam, IntPtr lParam);
-        
+
         [DllImport("user32.dll")]
         private static extern Int32 GetWindowTextLength(IntPtr hWnd);
-        
+
         [DllImport("user32.dll")]
         private static extern Int32 GetWindowText(IntPtr hWnd, StringBuilder text, Int32 maxLength);
-        
+
         [DllImport("user32.dll")]
         private static extern Boolean SetWindowText(IntPtr hWnd, String lpString);
-        
+
         [DllImport("user32.dll")]
         private static extern Int32 GetClassName(IntPtr hWnd, StringBuilder lpClassName, Int32 nMaxCount);
-        
+
         [DllImport("user32.dll")]
         private static extern Boolean EnumChildWindows(IntPtr hWndParent, EnumerateWindowDelegate callback, IntPtr data);
-        
+
         [DllImport("user32.dll", SetLastError = false)]
         private static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
-        
+
         [DllImport("user32.dll")]
         private static extern int GetDlgCtrlID(IntPtr hwndCtl);
+
+        [DllImport("kernel32.dll")]
+        static extern uint GetCurrentThreadId();
 
         #endregion
 
@@ -115,7 +118,7 @@ namespace WebBrowserControlDialogs
                     HookType.WH_CALLWNDPROCRET,
                         WindowsInterop._WH_CALLWNDPROCRET_PROC,
                             IntPtr.Zero,
-                                (uint)AppDomain.GetCurrentThreadId());
+                                (uint)GetCurrentThreadId());
 
                 // NB: Visual Studio will likely be upset about 
                 // the use of the Obsolete 'GetCurrentThreadId()' function
@@ -167,7 +170,7 @@ namespace WebBrowserControlDialogs
                     IntPtr pYesButtonHwnd = IntPtr.Zero;
 
                     // Check out further properties of the dialog
-                    foreach (IntPtr pChildOfDialog in WindowsInterop.listChildWindows(cwp.hwnd))
+                    foreach (IntPtr pChildOfDialog in WindowsInterop.ListChildWindows(cwp.hwnd))
                     {
                         // Go through all of the child controls on the dialog and see what they reveal via their text
                         iLength = GetWindowTextLength(pChildOfDialog);
@@ -176,16 +179,16 @@ namespace WebBrowserControlDialogs
                             StringBuilder sbProbe = new StringBuilder(iLength + 1);
                             GetWindowText(pChildOfDialog, sbProbe, sbProbe.Capacity);
 
-                            if (StringConstants.DialogTextSecureToNonSecureWarning.Equals(sbProbe.ToString(), 
+                            if (StringConstants.DialogTextSecureToNonSecureWarning.Equals(sbProbe.ToString(),
                                     StringComparison.InvariantCultureIgnoreCase) ||
-                                        StringConstants.DialogTextNonSecureToSecureWarning.Equals(sbProbe.ToString(), 
+                                        StringConstants.DialogTextNonSecureToSecureWarning.Equals(sbProbe.ToString(),
                                             StringComparison.InvariantCultureIgnoreCase))
                             {
                                 // Ok, the text says something about toggling secure/non-secure or vice-versa so,
                                 blnIsSslDialog = false;
                             }
 
-                            if(StringConstants.ButtonTextYes.Equals(sbProbe.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            if (StringConstants.ButtonTextYes.Equals(sbProbe.ToString(), StringComparison.InvariantCultureIgnoreCase))
                             {
                                 // Hey, this one says 'Yes', so cache a pointer to it
                                 pYesButtonHwnd = pChildOfDialog;
@@ -223,11 +226,11 @@ namespace WebBrowserControlDialogs
                     IntPtr pEditHwnd = IntPtr.Zero;
                     IntPtr pOkButtonHwnd = IntPtr.Zero;
 
-                    foreach (IntPtr pChildOfDialog in WindowsInterop.listChildWindows(cwp.hwnd))
+                    foreach (IntPtr pChildOfDialog in WindowsInterop.ListChildWindows(cwp.hwnd))
                     {
                         // Go through all of the child controls on the dialog and see what they reveal via their type/text
                         StringBuilder sbProbe = new StringBuilder(255);
-                        if (GetClassName(pChildOfDialog, sbProbe, sbProbe.Capacity) != 0 && 
+                        if (GetClassName(pChildOfDialog, sbProbe, sbProbe.Capacity) != 0 &&
                             !String.IsNullOrEmpty(sbProbe.ToString()))
                         {
                             if (sbProbe.ToString().Equals("SysCredential"))
@@ -235,20 +238,20 @@ namespace WebBrowserControlDialogs
                                 // This control is actually a set of controls called a "SysCredential" 
                                 // (as determined via Spy++), so cache it's child controls that are of 
                                 // type "ComboBoxEx32" and "Edit"
-                                foreach (IntPtr pChildOfSysCredential in WindowsInterop.listChildWindows(pChildOfDialog))
+                                foreach (IntPtr pChildOfSysCredential in WindowsInterop.ListChildWindows(pChildOfDialog))
                                 {
                                     StringBuilder sbProbe2 = new StringBuilder(255);
                                     if (GetClassName(pChildOfSysCredential, sbProbe2, sbProbe2.Capacity) != 0 &&
                                         !String.IsNullOrEmpty(sbProbe2.ToString()))
                                     {
-                                        if (StringConstants.WindowTypeCombo.Equals(sbProbe2.ToString(), 
+                                        if (StringConstants.WindowTypeCombo.Equals(sbProbe2.ToString(),
                                             StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             // Hey, here's the Combo
                                             pComboHwnd = pChildOfSysCredential;
                                         }
 
-                                        if (StringConstants.WindowTypeEdit.Equals(sbProbe2.ToString(), 
+                                        if (StringConstants.WindowTypeEdit.Equals(sbProbe2.ToString(),
                                             StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             // Hey, here's *an* Edit box.
@@ -262,7 +265,7 @@ namespace WebBrowserControlDialogs
                                 }
                             }
 
-                            if (StringConstants.WindowTypeButton.Equals(sbProbe.ToString(), 
+                            if (StringConstants.WindowTypeButton.Equals(sbProbe.ToString(),
                                 StringComparison.InvariantCultureIgnoreCase))
                             {
                                 // This control is a Button, does it have text, if so what does it say
@@ -271,7 +274,7 @@ namespace WebBrowserControlDialogs
                                 {
                                     StringBuilder sbText = new StringBuilder(iLength + 1);
                                     GetWindowText(pChildOfDialog, sbText, sbText.Capacity);
-                                    if (StringConstants.ButtonTextOk.Equals(sbText.ToString(), 
+                                    if (StringConstants.ButtonTextOk.Equals(sbText.ToString(),
                                         StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         // Hey, this one says 'OK', so cache a pointer to it
@@ -289,8 +292,8 @@ namespace WebBrowserControlDialogs
                     {
                         String sUsername = null;
                         String sPassword = null;
-                        
-                        if(ConnectToDialogWillBeShown(ref sUsername, ref sPassword) && 
+
+                        if (ConnectToDialogWillBeShown(ref sUsername, ref sPassword) &&
                             sUsername != null && sPassword != null && pOkButtonHwnd != IntPtr.Zero &&
                                 pComboHwnd != IntPtr.Zero && pEditHwnd != IntPtr.Zero)
                         {
@@ -318,14 +321,14 @@ namespace WebBrowserControlDialogs
 
         // Populate a list of all the child windows of a given parent 
         // (Uses the Win32 API's EnumChildWindows() function)
-        private static List<IntPtr> listChildWindows(IntPtr p)
+        private static List<IntPtr> ListChildWindows(IntPtr p)
         {
             List<IntPtr> lstChildWindows = new List<IntPtr>();
             GCHandle gchChildWindows = GCHandle.Alloc(lstChildWindows);
             try
             {
-                WindowsInterop.EnumChildWindows(p, 
-                    new EnumerateWindowDelegate(WindowsInterop.enumWindowsCallback), 
+                WindowsInterop.EnumChildWindows(p,
+                    new EnumerateWindowDelegate(WindowsInterop.EnumWindowsCallback),
                         GCHandle.ToIntPtr(gchChildWindows));
             }
             finally
@@ -339,20 +342,16 @@ namespace WebBrowserControlDialogs
 
         // Callback method called when EnumChildWindows is enumerating windows.
         // (Called by the Win32API EnumChildWindows function)
-        private static bool enumWindowsCallback(IntPtr hwnd, IntPtr p)
+        private static bool EnumWindowsCallback(IntPtr hwnd, IntPtr p)
         {
             GCHandle gch = GCHandle.FromIntPtr(p);
-            if (gch != null)
+            if (gch.Target is not List<IntPtr> lstChildWindows)
             {
-                List<IntPtr> lstChildWindows = gch.Target as List<IntPtr>;
-                if (lstChildWindows == null)
-                {
-                    // This should NEVER happen
-                    throw new InvalidCastException(StringConstants.GCHandleTargetIsNotExpectedType);
-                }
-
-                lstChildWindows.Add(hwnd);
+                // This should NEVER happen
+                throw new InvalidCastException(StringConstants.GCHandleTargetIsNotExpectedType);
             }
+
+            lstChildWindows.Add(hwnd);
 
             // Continue processing down the parent-child chain
             return true;
